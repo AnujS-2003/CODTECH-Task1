@@ -1,0 +1,59 @@
+import re
+
+def validate_password(password):
+    """
+    Validate a password based on the following rules:
+    1. At least 8 characters long.
+    2. Contains at least one uppercase letter.
+    3. Contains at least one lowercase letter.
+    4. Contains at least one digit.
+    5. Contains at least one special character from the set (!@#$%^&*()-+).
+    """
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long."
+    
+    if not re.search(r'[A-Z]', password):
+        return False, "Password must include at least one uppercase letter."
+    
+    if not re.search(r'[a-z]', password):
+        return False, "Password must include at least one lowercase letter."
+    
+    if not re.search(r'[0-9]', password):
+        return False, "Password must include at least one digit."
+    
+    if not re.search(r'[!@#$%^&*()\-\+]', password):
+        return False, "Password must include at least one special character (!@#$%^&*()-+)."
+    
+    return True, "Password is valid."
+
+def authenticate_password(saved_password):
+    """
+    Authenticate a password by comparing it with the saved password.
+    """
+    entered_password = input("Enter your password: ")
+    if entered_password == saved_password:
+        return True, "Authentication successful!"
+    else:
+        return False, "Authentication failed. Incorrect password."
+
+# Main program
+if __name__ == "__main__":
+    # Ask the user to create a password
+    print("Create a password with the following rules:")
+    print("1. At least 8 characters long.")
+    print("2. At least one uppercase letter.")
+    print("3. At least one lowercase letter.")
+    print("4. At least one digit.")
+    print("5. At least one special character (!@#$%^&*()-+).")
+    
+    while True:
+        password = input("Enter your password: ")
+        valid, message = validate_password(password)
+        print(message)
+        if valid:
+            break
+    
+    # Simulate authentication
+    print("\nNow authenticate your password.")
+    authenticated, auth_message = authenticate_password(password)
+    print(auth_message)
