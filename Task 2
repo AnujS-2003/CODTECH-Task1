@@ -1,0 +1,87 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstring>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+using namespace std;
+
+// Function to scan a port
+bool scanPort(const string &target, int port) {
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) {
+        cerr << "Socket creation failed!" << endl;
+        return false;
+    }
+
+    sockaddr_in server{};
+    server.sin_family = AF_INET;
+    server.sin_port = htons(port);
+    inet_pton(AF_INET, target.c_str(), &server.sin_addr);
+
+    // Attempt to connect to the port
+    int connection = connect(sock, (struct sockaddr *)&server, sizeof(server));
+    close(sock);
+
+    return (connection == 0); // Port is open if connection succeeds
+}
+
+// Function for banner grabbing
+string bannerGrab(const string &target, int port) {
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) {
+        return "Socket creation failed!";
+    }
+
+    sockaddr_in server{};
+    server.sin_family = AF_INET;
+    server.sin_port = htons(port);
+    inet_pton(AF_INET, target.c_str(), &server.sin_addr);
+
+    if (connect(sock, (struct sockaddr *)&server, sizeof(server)) != 0) {
+        close(sock);
+        return "Connection failed!";
+    }
+
+    const char *request = "HEAD / HTTP/1.1\r\n\r\n";
+    send(sock, request, strlen(request), 0);
+
+    char buffer[1024] = {0};
+    recv(sock, buffer, sizeof(buffer) - 1, 0);
+    close(sock);
+
+    return string(buffer);
+}
+
+// Function to scan ports and perform banner grabbing
+void scanPorts(const string &target, const vector<int> &ports) {
+    cout << "Scanning target: " << target << endl;
+    for (int port : ports) {
+        if (scanPort(target, port)) {
+            cout << "Port " << port << " is open." << endl;
+            string banner = bannerGrab(target, port);
+            cout << "Banner: " << banner << endl;
+        } else {
+            cout << "Port " << port << " is closed." << endl;
+        }
+    }
+}
+
+// Main program
+int main() {
+    string target;
+    cout << "Enter the target IP or domain: ";
+    cin >> target;
+
+    // Common ports to scan
+    vector<int> commonPorts = {21, 22, 23, 25, 53, 80, 110, 143, 443, 8080};
+
+    // Perform the scan
+    scanPorts(target, commonPorts);
+
+    cout << "Scan complete." << endl;
+    return 0;
+}
