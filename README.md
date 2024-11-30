@@ -47,3 +47,7 @@ Hashing ensures secure storage of passwords.
 Hidden input prevents shoulder-surfing.
 Limited attempts add an extra layer of protection.
 Modular Design: The program is organized into functions for validation and authentication, making it reusable and easy to extend.
+
+OUTPUT:-
+![Screenshot 2024-11-29 205657](https://github.com/user-attachments/assets/5cd42fae-50ea-40c8-8e42-91eedce582f1)
+
